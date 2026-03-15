@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Library.domain.Models
 {
-    public class Loans
+    public class Member
     {
     }
 }
