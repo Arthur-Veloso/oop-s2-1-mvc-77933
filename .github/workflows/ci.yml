@@ -2,9 +2,10 @@ name: .NET CI
 
 on:
   push:
-    branches: [ main, mvc-assignment-version ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
+      - mvc-assignment-version
+      - community-library-system
 
 jobs:
   build:
