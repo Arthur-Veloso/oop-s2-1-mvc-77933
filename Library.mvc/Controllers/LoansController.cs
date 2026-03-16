@@ -182,5 +182,23 @@ namespace Library.mvc.Controllers
         {
             return _context.Loans.Any(e => e.Id == id);
         }
+
+        // Loans/Return/5
+        public async Task<IActionResult> Return(int id)
+        {
+            var loan = await _context.Loans.FindAsync(id);
+
+            if (loan == null)
+            {
+                return NotFound();
+            }
+
+            loan.ReturnedDate = DateTime.Now;
+
+            _context.Update(loan);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
