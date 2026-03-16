@@ -1,12 +1,13 @@
 ﻿using Bogus;
 using global::Library.domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace Library.mvc.Data
 {
     public static class SeedData
     {
-        public static void Initialize(IServiceProvider serviceProvider)
+        public static async Task Initialize(IServiceProvider serviceProvider)
         {
             using var context = new ApplicationDbContext(
                 serviceProvider.GetRequiredService<DbContextOptions<ApplicationDbContext>>());
@@ -50,6 +51,37 @@ namespace Library.mvc.Data
             context.Loans.AddRange(loans);
 
             context.SaveChanges();
+
+            // ---------- ADMIN ROLE + USER SEED ----------
+
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+
+            string adminRole = "Admin";
+            string adminEmail = "admin@library.com";
+            string adminPassword = "Admin123!";
+
+            // Create Admin role if it doesn't exist
+            if (!await roleManager.RoleExistsAsync(adminRole))
+            {
+                await roleManager.CreateAsync(new IdentityRole(adminRole));
+            }
+
+            // Create Admin user if it doesn't exist
+            var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+            if (adminUser == null)
+            {
+                adminUser = new IdentityUser
+                {
+                    UserName = adminEmail,
+                    Email = adminEmail
+                };
+
+                await userManager.CreateAsync(adminUser, adminPassword);
+                await userManager.AddToRoleAsync(adminUser, adminRole);
+            }
         }
+
     }
 }
